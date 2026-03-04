@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Genshin Impact Fan Page - HTML Edition</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            --gold: #ece5d8;
+            --accent-ice: #91d7ff;
+            --accent-fire: #ff8e8e;
+            --bg-dark: rgba(0, 0, 0, 0.7);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; }
+        body { background: #000; color: var(--gold); overflow: hidden; height: 100vh; }
+
+        /* 背景影片與濾鏡 */
+        .video-container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            filter: brightness(0.6) contrast(1.1);
+        }
+        video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 導航欄 */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 30px 60px; position: relative; z-index: 100;
+        }
+        .logo { font-size: 28px; font-weight: 900; letter-spacing: 3px; border: 2px solid var(--gold); padding: 5px 15px; }
+
+        /* 主舞台 */
+        .stage {
+            display: flex; align-items: center; height: calc(100vh - 100px);
+            padding: 0 10%; position: relative;
+        }
+
+        .info-card { width: 450px; z-index: 10; }
+        .info-card h1 { font-size: 70px; margin-bottom: 10px; text-shadow: 0 0 20px rgba(0,0,0,0.8); }
+        .tag { display: inline-block; padding: 5px 15px; background: var(--accent-ice); color: #111; font-weight: bold; margin-bottom: 20px; }
+        .desc { background: var(--bg-dark); padding: 25px; line-height: 1.8; border-radius: 0 30px 0 30px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+
+        /* 角色大圖 */
+        .char-wrapper {
+            position: absolute; right: 5%; bottom: -50px; height: 100vh;
+            display: flex; align-items: flex-end;
+        }
+        .char-img { height: 95%; filter: drop-shadow(0 0 50px rgba(0,0,0,0.8)); pointer-events: none; }
+
+        /* 角色切換選單 (下方) */
+        .char-selector {
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 20px; z-index: 100;
+        }
+        .char-item {
+            width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--gold);
+            cursor: pointer; overflow: hidden; transition: 0.3s; background: #333;
+        }
+        .char-item:hover { transform: scale(1.1); border-color: #fff; box-shadow: 0 0 15px #fff; }
+        .char-item img { width: 100%; height: 100%; object-fit: cover; }
+
+    </style>
+</head>
+<body>
+
+<div class="video-container">
+    <video autoplay muted loop id="mainVibe">
+        <source src="https://webstatic.hoyoverse.com/upload/content_v2/official/10/2021/07/20/4b6d6f8f4a6b8e8f8f8f8f8f8f8f8f8f.mp4" type="video/mp4">
+    </video>
+</div>
+
+<nav>
+    <div class="logo">IMPACT.SYS</div>
+    <div>MUSIC ON</div>
+</nav>
+
+<div class="stage">
+    <div class="info-card">
+        <div class="tag" id="elementTag">ICE / 冰屬性</div>
+        <h1 id="charName">神里綾華</h1>
+        <p class="desc" id="charDesc">稻妻「社奉行」神里家的大小姐。姿容端麗，舉止得體，深受民眾愛戴。</p>
+    </div>
+
+    <div class="char-wrapper">
+        <img src="https://upload-os-bbs.hoyolab.com/upload/2021/07/21/1015607/8c13010b986872589e4918e6e96a2468_8283030368146604535.png" class="char-img" id="charDisplay">
+    </div>
+</div>
+
+<div class="char-selector">
+    <div class="char-item" onclick="switchChar('ayaka')"><img src="https://paimon.moe/images/characters/ayaka.png"></div>
+    <div class="char-item" onclick="switchChar('yoimiya')"><img src="https://paimon.moe/images/characters/yoimiya.png"></div>
+</div>
+
+<script>
+    const charData = {
+        ayaka: {
+            name: "神里綾華",
+            tag: "ICE / 冰屬性",
+            color: "#91d7ff",
+            desc: "稻妻「社奉行」神里家的大小姐。姿容端麗，舉止得體，深受民眾愛戴。",
+            img: "https://upload-os-bbs.hoyolab.com/upload/2021/07/21/1015607/8c13010b986872589e4918e6e96a2468_8283030368146604535.png"
+        },
+        yoimiya: {
+            name: "宵宮",
+            tag: "FIRE / 火屬性",
+            color: "#ff8e8e",
+            desc: "「長野原煙花店」現任店主，被譽為「夏祭的女王」，將人們的願望寄託於煙花之中。",
+            img: "https://upload-static.hoyoverse.com/content_v2/official/10/2021/07/21/17079b7754f7626359515942468f77e6_7733221389825488057.png"
+        }
+    };
+
+    function switchChar(key) {
+        const data = charData[key];
+        
+        // 切換動畫：先淡出再淡入
+        gsap.to(".stage", { opacity: 0, x: -20, duration: 0.3, onComplete: () => {
+            document.getElementById('charName').innerText = data.name;
+            document.getElementById('charDesc').innerText = data.desc;
+            document.getElementById('charDisplay').src = data.img;
+            document.getElementById('elementTag').innerText = data.tag;
+            document.getElementById('elementTag').style.background = data.color;
+            
+            gsap.to(".stage", { opacity: 1, x: 0, duration: 0.5 });
+            gsap.from("#charDisplay", { scale: 1.1, duration: 1.2, ease: "power2.out" });
+        }});
+    }
+
+    // 初始化呼吸動畫
+    gsap.to("#charDisplay", { y: 15, duration: 2.5, repeat: -1, yoyo: true, ease: "sine.inOut" });
+</script>
+
+</body>
+</html>
